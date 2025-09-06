@@ -1,22 +1,31 @@
+// File: /api/proxy/[...slug].js
+
 export default async function handler(req, res) {
-    console.log("Received request:", req.method, req.url, req.body);
-    res.status(200).json({ ok: true });
   try {
-    const { slug } = req.query;
-    const targetUrl = `https://prod.softswiss.bet/${slug.join('/')}`;
+    // Log incoming request for debugging
+    console.log("Request received:", req.method, req.url, req.body);
 
-    const response = await fetch(targetUrl, {
+    // Build the target URL dynamically from the slug
+    const { slug } = req.query; // slug is an array
+    const targetUrl = `https://prod.bgaming.bet/${slug.join('/')}`;
+
+    // Forward the request
+    const fetchOptions = {
       method: req.method,
-      headers: { ...req.headers },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
-    });
+      headers: {
+        ...req.headers,
+        host: undefined, // remove host to avoid conflicts
+      },
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
+    };
 
-    const contentType = response.headers.get('content-type');
-    const data = contentType?.includes('application/json') ? await response.json() : await response.text();
+    const response = await fetch(targetUrl, fetchOptions);
+
+    // Forward the response back to the client
+    const data = await response.text(); // use text() in case it's not JSON
     res.status(response.status).send(data);
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Proxy crashed', details: err.message });
+  } catch (error) {
+    console.error("Proxy error:", error);
+    res.status(500).json({ error: "Proxy failed", details: error.message });
   }
 }
