@@ -1,8 +1,14 @@
 {
   "rewrites": [
     {
-      "source": "/api/proxy/:path*",
-      "destination": "/api/proxy/[...slug].js"
+      "source": "/api/proxy/bgaming/bgaming-aviamasters/:path*",
+      "destination": "/pages/api/proxy/[...slug].js"
+    }
+  ],
+  "builds": [
+    {
+      "src": "pages/api/proxy/[...slug].js",
+      "use": "@vercel/node"
     }
   ],
   "headers": [
@@ -13,12 +19,6 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" }
       ]
-    }
-  ],
-  "builds": [
-    {
-      "src": "pages/api/proxy/[...slug].js",
-      "use": "@vercel/node"
     }
   ]
 }
