@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/proxy/:path*",
+      "destination": "/api/proxy/:path*"
+    }
+  ],
+  "builds": [
+    {
+      "src": "pages/api/proxy/[...slug].js",
+      "use": "@vercel/node"
+    }
+  ]
+}
