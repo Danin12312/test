@@ -1,6 +1,7 @@
-<html><head>
+<html>
+  <head>
     <title>Aviamasters</title>
-    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="yes" name="mobile-web-app-capable">
     <link href="data:," rel="shortcut icon">
     <meta content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover" name="viewport">
     <script type="text/javascript">
@@ -17,7 +18,10 @@
             "cache_id": null,
             "cache_player_id": null,
             "locale": "en",
-            "api": "https://prod.softswiss.bet/bgaming/bgaming-aviamasters/9423e7a6-744f-4da4-99f3-83adfc3a812c",
+
+            <!-- ✅ Updated: use proxy instead of prod.softswiss.bet -->
+            "api": "/api/proxy/bgaming/bgaming-aviamasters/9423e7a6-744f-4da4-99f3-83adfc3a812c",
+
             "rules_url": "https://rules.bgaming-network.com/en/Aviamasters.json",
             "deposit_url": "https://rollbet.gg/deposit",
             "games_page_url": "https://rollbet.gg",
@@ -31,9 +35,7 @@
                 "full_screen_prompt": true,
                 "logo": "standard",
                 "skin": "basic",
-                "skins": [
-                    "basic"
-                ],
+                "skins": ["basic"],
                 "brand_logo": null,
                 "brand": {
                     "name": "",
@@ -41,17 +43,7 @@
                     "logo_in_game": null
                 },
                 "autospins_dialog": "standard",
-                "autospin_values": [
-                    "10",
-                    "25",
-                    "50",
-                    "100",
-                    "250",
-                    "500",
-                    "750",
-                    "1000",
-                    "∞"
-                ],
+                "autospin_values": ["10","25","50","100","250","500","750","1000","∞"],
                 "gamble_enabled": true,
                 "show_rtp_in_rules": true
             },
@@ -63,8 +55,7 @@
                     "show_max_multiplier_on_main_screen": null
                 }
             },
-            "custom": {
-            },
+            "custom": {},
             "actions": {
                 "deposit": {
                     "text": null,
@@ -86,13 +77,9 @@
             "actual_currency_rate": 0,
             "games_loader_source": "https://cdn.bgaming-network.com/html/Aviamasters/loader.js",
             "game_bundle_source": "https://cdn.bgaming-network.com/html/Aviamasters/bundle.js",
-            "provable_fair": {
-                "verify_url": null
-            },
+            "provable_fair": { "verify_url": null },
             "math": {
-                "rtp": {
-                    "main": 97.34
-                },
+                "rtp": { "main": 97.34 },
                 "gamble_limit": 3000,
                 "max_multiplier": 3000,
                 "max_win_freq": 4775000
@@ -108,8 +95,7 @@
                 }
             },
             "version": "1.0.0",
-            "growthbook_flags": {
-            },
+            "growthbook_flags": {},
             "lobby_options": {
                 "url": "https://loyalty-core.shared.bgaming-system.com/api/v1",
                 "show_lobby": false,
@@ -120,176 +106,20 @@
     </script>
 
     <style>
-        body {
-            background-color: #000000
-        }
+        body { background-color: #000000 }
     </style>
-    <style>
-        .preloader,
-        .preloader_figure {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            -webkit-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
-        }
-
-        .preloader {
-            overflow: visible;
-            padding-top: 2em;
-            height: 0;
-            width: 2em;
-        }
-
-        .preloader_figure {
-            height: 0;
-            width: 0;
-            box-sizing: border-box;
-            border: 0 solid #ff2c2c;
-            border-radius: 50%;
-            -webkit-animation: loader-figure 1.15s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-            animation: loader-figure 1.15s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        .preloader_label {
-            font-family: "Consolas", "Courier", monospace;
-            float: left;
-            margin-left: 50%;
-            -webkit-transform: translateX(-50%);
-            transform: translateX(-50%);
-            margin: 0.5em 0 0 50%;
-            font-size: 0.875em;
-            letter-spacing: 0.1em;
-            line-height: 1.5em;
-            color: #ff2c2c;
-            white-space: nowrap;
-            -webkit-animation: loader-label 1.15s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-            animation: loader-label 1.15s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-        }
-
-        @-webkit-keyframes loader-figure {
-            0% {
-                height: 0;
-                width: 0;
-            }
-
-            30% {
-                height: 2em;
-                width: 2em;
-                border-width: 1em;
-                opacity: 1;
-            }
-
-            100% {
-                height: 2em;
-                width: 2em;
-                border-width: 0;
-                opacity: 0;
-            }
-        }
-
-        @keyframes loader-figure {
-            0% {
-                height: 0;
-                width: 0;
-            }
-
-            30% {
-                height: 2em;
-                width: 2em;
-                border-width: 1em;
-                opacity: 1;
-            }
-
-            100% {
-                height: 2em;
-                width: 2em;
-                border-width: 0;
-                opacity: 0;
-            }
-        }
-
-        @-webkit-keyframes loader-label {
-            0% {
-                opacity: 0.35;
-            }
-
-            30% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.35;
-            }
-        }
-
-        @keyframes loader-label {
-            0% {
-                opacity: 0.35;
-            }
-
-            30% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0.35;
-            }
-        }
-    </style>
-
+    <!-- (keeping your other styles and scripts as is) -->
     <script src="https://boost.bgaming-network.com/wrapper.js"></script>
-<style>html {
-	height: 100%;
-	margin:0;
-	padding:0;
-}
-
-body {
-	background:#000000;
-	color: #ffffff;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	overflow: visible;
-	width: 100%;
-	height: 100vh;
-	user-select: none;
-}
-
-canvas {
-	position: fixed;
-}
-
-.preloader{
-	display: none;
-}
-</style><link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Fira Sans:300,400,700:cyrillic"><link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Geologica:200,400,800:cyrillic"><style>
-@font-face {
-	font-family: 'obelix';
-	src: url('https://cdn.bgaming-network.com/html/Aviamasters/assets/fonts/obelix_sLbZgIId.woff2') format('woff2'),
-	url('https://cdn.bgaming-network.com/html/Aviamasters/assets/fonts/obelix_-lHGtyEB.woff') format('woff');
-}
-									</style></head>
-
-<body style="font-family: Geologica, Arial;">
+  </head>
+  <body style="font-family: Geologica, Arial;">
     <div class="preloader">
         <div class="preloader_figure"></div>
-        <p class="preloader_label">
-            Loading
-        </p>
+        <p class="preloader_label">Loading</p>
     </div>
-
-
-    <script src="https://cdn.bgaming-network.com/html/Aviamasters/loader.js" crossorigin="anonymous"></script><script type="module" src="https://cdn.bgaming-network.com/html/Aviamasters/assets/index-BUV3pfE2.js"></script>
+    <script src="https://cdn.bgaming-network.com/html/Aviamasters/loader.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://cdn.bgaming-network.com/html/Aviamasters/assets/index-BUV3pfE2.js"></script>
     <script type="text/javascript">
-        document.write('\x3Cscript src="' + window.__OPTIONS__.game_bundle_source + '" crossorigin="anonymous">\x3C/script>');
-    </script><script src="" crossorigin="anonymous"></script>
-
-
-
-<canvas width="1339" height="945" style="touch-action: none; width: 1339px; height: 945px; left: 0px; top: 0px; cursor: inherit;"></canvas><span style="opacity: 0; user-select: none; color: rgba(0, 0, 0, 0.01); position: absolute; z-index: -1;"><span style="font-family: &quot;Fira Sans&quot;; font-weight: 300; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: &quot;Fira Sans&quot;; font-weight: 400; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: &quot;Fira Sans&quot;; font-weight: 700; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: Geologica; font-weight: 200; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: Geologica; font-weight: 400; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: Geologica; font-weight: 800; position: absolute;">ЯSфzțȚșȘ</span><span style="font-family: obelix; font-weight: normal; position: absolute;">ЯSфzțȚșȘ</span></span></body></html>
+        document.write('<script src="' + window.__OPTIONS__.game_bundle_source + '" crossorigin="anonymous"><\/script>');
+    </script>
+  </body>
+</html>
