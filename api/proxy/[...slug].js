@@ -1,13 +1,13 @@
 // File: /pages/api/proxy/[...slug].js
+
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   try {
     const { slug } = req.query;
 
-    // Check if slug is undefined or not an array.
+    // Check if slug is missing or invalid.
     if (!slug || !Array.isArray(slug)) {
-      // Log the request query to help debug why slug is missing
       console.error("Missing or invalid slug:", req.query);
       return res.status(500).json({ error: "Proxy failed", details: "Invalid slug parameter in request." });
     }
@@ -24,7 +24,6 @@ export default async function handler(req, res) {
     };
 
     const response = await fetch(targetUrl, fetchOptions);
-
     const data = await response.text();
     res.status(response.status).send(data);
 
