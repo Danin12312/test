@@ -7,11 +7,15 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(targetUrl, {
       method: req.method,
-      headers: { ...req.headers, host: 'prod.softswiss.bet' },
+      headers: {
+        ...req.headers,
+        host: 'prod.softswiss.bet',
+        'accept-encoding': 'gzip, deflate, br',
+      },
       body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
     });
 
-    const data = await response.text();
+    const data = await response.text(); // Use text because it might not be JSON
     res.status(response.status).send(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
