@@ -1,30 +1,20 @@
-const fetch = require('node-fetch');
-
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
-    const { slug } = req.query; // Array of path segments
+    const { slug } = req.query;
     const targetUrl = `https://prod.softswiss.bet/${slug.join('/')}`;
 
-    // Forward headers and body
-    const fetchOptions = {
+    const response = await fetch(targetUrl, {
       method: req.method,
       headers: { ...req.headers },
-    };
+      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined
+    });
 
-    // Only forward body if it's POST, PUT, PATCH
-    if (req.method !== 'GET' && req.body) {
-      fetchOptions.body = JSON.stringify(req.body);
-      fetchOptions.headers['Content-Type'] = 'application/json';
-    }
-
-    const response = await fetch(targetUrl, fetchOptions);
     const contentType = response.headers.get('content-type');
-
-    // Forward response
-    const data = contentType && contentType.includes('application/json') ? await response.json() : await response.text();
+    const data = contentType?.includes('application/json') ? await response.json() : await response.text();
     res.status(response.status).send(data);
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Proxy function crashed', details: err.message });
+    res.status(500).json({ error: 'Proxy crashed', details: err.message });
   }
-};
+}
