@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
+  res.status(200).json({ ok: true });
   const { slug } = req.query; // slug is an array
   const targetUrl = `https://prod.softswiss.bet/${slug.join('/')}`;
 
