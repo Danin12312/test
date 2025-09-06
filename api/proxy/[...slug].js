@@ -1,18 +1,17 @@
 // File: /pages/api/proxy/[...slug].js
-
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   try {
-    const { slug } = req.query;
+    const { path } = req.query; // Use 'path' to match vercel.json rewrite rule
 
-    // Check if slug is missing or invalid.
-    if (!slug || !Array.isArray(slug)) {
-      console.error("Missing or invalid slug:", req.query);
-      return res.status(500).json({ error: "Proxy failed", details: "Invalid slug parameter in request." });
+    // Check if path is missing or invalid.
+    if (!path || !Array.isArray(path)) {
+      console.error("Missing or invalid path:", req.query);
+      return res.status(500).json({ error: "Proxy failed", details: "Invalid path parameter in request." });
     }
 
-    const targetUrl = `https://prod.bgaming.bet/${slug.join('/')}`;
+    const targetUrl = `https://prod.bgaming.bet/bgaming/bgaming-aviamasters/${path.join('/')}`;
 
     const fetchOptions = {
       method: req.method,
