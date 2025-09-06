@@ -1,19 +1,19 @@
 import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
-  const { slug } = req.query; // array of path segments
-  const targetUrl = `https://prod.softswiss.bet/bgaming/${slug.join('/')}`;
+  const { slug } = req.query; // slug is an array of path segments
+  const targetUrl = `https://prod.softswiss.bet/${slug.join('/')}`;
 
   try {
     const response = await fetch(targetUrl, {
       method: req.method,
-      headers: { 'Content-Type': 'application/json' },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
+      headers: req.headers,
+      body: req.method !== 'GET' ? req.body : undefined,
     });
 
-    const data = await response.text();
+    const data = await response.text(); // or json() if API returns JSON
     res.status(response.status).send(data);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Proxy error', details: err.message });
   }
 }
