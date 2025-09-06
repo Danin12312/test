@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/api/proxy/:slug*",
+      "source": "/api/proxy/:path*",
       "destination": "/api/proxy/[...slug].js"
     }
   ],
@@ -12,7 +12,9 @@
         { "key": "Access-Control-Allow-Origin", "value": "*" },
         { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" }
-      ],
+      ]
+    }
+  ],
   "builds": [
     {
       "src": "pages/api/proxy/[...slug].js",
