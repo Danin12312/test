@@ -3,27 +3,41 @@
 export default async function handler(req, res) {
   try {
     // Log incoming request for debugging
-    console.log("Request received:", req.method, req.url, req.body);
+    console.log("Request received:", req.method, req.url);
+    console.log("Request headers:", req.headers);
+    console.log("Request body:", req.body); // Check if the body is received
 
-    // Build the target URL dynamically from the slug
-    const { slug } = req.query; // slug is an array
+    // Dynamically build the target URL from the slug
+    const { slug } = req.query;
     const targetUrl = `https://prod.bgaming.bet/${slug.join('/')}`;
 
-    // Forward the request
+    // Log the target URL to ensure it's correct
+    console.log("Proxying to:", targetUrl);
+
+    // Create fetch options
     const fetchOptions = {
       method: req.method,
       headers: {
         ...req.headers,
-        host: undefined, // remove host to avoid conflicts
+        // Crucially, remove the 'host' header as it can cause authentication/routing issues on the target server
+        host: undefined,
       },
+      // Pass the request body correctly
       body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
     };
 
+    // Forward the request
     const response = await fetch(targetUrl, fetchOptions);
 
-    // Forward the response back to the client
-    const data = await response.text(); // use text() in case it's not JSON
-    res.status(response.status).send(data);
+    // Forward all headers from the target server back to the client
+    response.headers.forEach((value, name) => {
+      res.setHeader(name, value);
+    });
+
+    // Use a stream for large responses to prevent memory issues
+    res.status(response.status);
+    response.body.pipe(res);
+
   } catch (error) {
     console.error("Proxy error:", error);
     res.status(500).json({ error: "Proxy failed", details: error.message });
