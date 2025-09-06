@@ -2,13 +2,17 @@
   "rewrites": [
     {
       "source": "/api/proxy/:path*",
-      "destination": "/api/proxy/:path*"
+      "destination": "/api/proxy/[...slug].js"
     }
   ],
-  "builds": [
+  "headers": [
     {
-      "src": "pages/api/proxy/[...slug].js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" }
+      ]
     }
   ]
 }
