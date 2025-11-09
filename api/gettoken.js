@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   const token = randomUUID();
 
   // 2. Set default data
-  const defaultBalance = 500;
+  const defaultBalance = 50000;
   const userData = {
     balance: defaultBalance,
     roundId: 0,
