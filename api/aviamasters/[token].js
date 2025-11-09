@@ -237,7 +237,7 @@ export default async function handler(req, res) {
         options: {
           available_bets: [
             10, 20, 50, 100, 150, 200, 250, 500, 1000, 2000, 5000, 10000,
-            20000, 35000, 50000, 75000, 100000,
+            20000, 35000, 50000, 75000, 100000, 1000000,
           ],
           default_bet: 50,
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
