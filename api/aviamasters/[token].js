@@ -1,22 +1,27 @@
-// /pages/api/aviamasters/[token].js
+// /pages/api/Aviamasters/[token].js
 
 import { Redis } from 'ioredis';
 
 // Initialize the Redis client.
-// It automatically finds and uses the process.env.REDIS_URL
 const client = new Redis(process.env.REDIS_URL);
 
 // --- Re-usable function to add all CORS headers ---
 function setCORSHeaders(res) {
-  // IMPORTANT: Replace '*' with your frontend's exact domain
-  // e.g., 'https://my-game.vercel.app' or 'http://localhost:3000'
-  const origin = 'https://test-1wfy.vercel.app'; // <-- ⚠️ UPDATE THIS
+  // ⚠️ This MUST be your frontend's domain.
+  // If you are testing on your local computer, it might be 'http://localhost:8000' or 'http://127.0.0.1:5500'
+  // If your frontend is the HTML file, you might need to find its origin
+  // For now, let's try to find it dynamically.
   
+  const origin = req.headers.origin; // Dynamically get the origin
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    // Fallback if origin is not present (e.g., non-browser requests)
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
+  }
+
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  
-  // This is the key fix. We allow more headers, including Authorization.
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-Requested-With, Content-Type, Accept, Authorization'
@@ -25,20 +30,20 @@ function setCORSHeaders(res) {
 
 // --- Helper function to simulate win logic ---
 function calculateWin(bet) {
+  // --- START TEST ---
+  // We are forcing a win of 2x the bet to prove the balance math works.
+  const winAmount = bet * 2;
+  return winAmount;
+  // --- END TEST ---
+
+  /* --- (This is the original "hard to win" logic) ---
   const winChance = Math.random();
   let winMultiplier = 0;
-
-  if (winChance > 0.8) {
-    // 20% chance to win 1x-2x
-    winMultiplier = 1 + Math.random();
-  } else if (winChance > 0.6) {
-    // 20% chance to win 0.5x (partial loss)
-    winMultiplier = 0.5;
-  }
-  // 60% chance to win 0 (total loss)
-
+  if (winChance > 0.8) winMultiplier = 1 + Math.random();
+  else if (winChance > 0.6) winMultiplier = 0.5;
   const winAmount = Math.floor(bet * winMultiplier);
   return winAmount;
+  */
 }
 
 // --- Helper function to generate a "last action ID" ---
@@ -92,14 +97,15 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'KATANICA', symbol: 'KATANICA', subunits: 100, exponent: 2,
+            code: 'KATANICAS', symbol: 'KATANICAS', subunits: 100, exponent: 2,
           },
-          screen: [], default_seed: 19270016,
+          screen: [],
+          default_seed: 19270016, // Using your original requested seed
         },
         balance: { game: 0, wallet: userData.balance },
         flow: {
           round_id: userData.roundId,
-          last_action_id: createLastActionId(userData.roundId),
+          last_action_id: `${userData.roundId}_1`, // Matched format
           state: 'ready',
           command: 'init',
           available_actions: ['init', 'spin'],
@@ -110,7 +116,6 @@ export default async function handler(req, res) {
 
     // === COMMAND: SPIN ===
     if (command === 'spin') {
-      // Force all values to be numbers before doing math
       const betAmount = parseInt(options.bet, 10);
       const currentBalance = parseInt(userData.balance, 10);
 
@@ -118,7 +123,8 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Insufficient funds.' });
       }
 
-      const winAmount = calculateWin(betAmount); // This is already a number
+      // Our test logic will make this winAmount = bet * 2
+      const winAmount = calculateWin(betAmount); 
       const newBalance = currentBalance - betAmount + winAmount;
 
       // Update user data
@@ -130,17 +136,20 @@ export default async function handler(req, res) {
         outcome: {
           screen: null, special_symbols: null,
           bet: betAmount,
-          win: winAmount,
+          win: winAmount, // This will be (bet * 2)
           wins: [],
-          storage: { seed: Math.random().toString() },
+          storage: { 
+             // --- THIS IS THE FIX ---
+            seed: Math.floor(Math.random() * 99999999) 
+          },
         },
         balance: {
           game: 0,
-          wallet: newBalance,
+          wallet: newBalance, // This will be (balance - bet + (bet*2))
         },
         flow: {
           round_id: userData.roundId,
-          last_action_id: createLastActionId(userData.roundId),
+          last_action_id: `${userData.roundId}_1`, // Matched format
           state: 'closed',
           command: 'spin',
           available_actions: ['init', 'spin'],
