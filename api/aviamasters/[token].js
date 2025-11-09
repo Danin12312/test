@@ -8,10 +8,19 @@ const client = new Redis(process.env.REDIS_URL);
 
 // --- Re-usable function to add all CORS headers ---
 function setCORSHeaders(res) {
+  // IMPORTANT: Replace '*' with your frontend's exact domain
+  // e.g., 'https://my-game.vercel.app' or 'http://localhost:3000'
+  const origin = 'https://test-ten-omega-97.vercel.app'; // <-- ⚠️ UPDATE THIS
+  
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*'); // Or your specific domain
+  res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // This is the key fix. We allow more headers, including Authorization.
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With, Content-Type, Accept, Authorization'
+  );
 }
 
 // --- Helper function to simulate win logic ---
