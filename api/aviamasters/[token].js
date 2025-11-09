@@ -2,29 +2,28 @@
 
 import { Redis } from 'ioredis';
 
+// Initialize the Redis client.
 const client = new Redis(process.env.REDIS_URL);
 
 // --- Re-usable function to add all CORS headers ---
-// --- FIX: Added 'req' as an argument ---
 function setCORSHeaders(req, res) {
-  // ------------------------------------------------------------------
-  // ⚠️ YOU MUST UPDATE THIS LINE ⚠️
-  //
-  // Put your *exact* frontend domain here.
-  // If you ran "npx serve", this will be 'http://localhost:3000'
-  //
-  const origin = 'https://test-1wfy.vercel.app/'; // <-- ⚠️ UPDATE THIS
-  //
-  // ------------------------------------------------------------------
+  // This must be your exact frontend domain (e.g., 'http://localhost:3000')
+  const origin = req.headers.origin; 
   
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else {
+    res.setHeader('Access-Control-Allow-Origin', '*'); 
+  }
+
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', origin); // Must be a specific domain
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-Requested-With, Content-Type, Accept, Authorization'
   );
 }
+
 // --- Helper function to simulate win logic ---
 function calculateWin(bet) {
   // --- START TEST ---
@@ -43,7 +42,6 @@ function createLastActionId(roundId) {
 // --- Main API Handler ---
 export default async function handler(req, res) {
   // --- Add CORS Headers to all responses ---
-  // --- FIX: Passed 'req' to the function ---
   setCORSHeaders(req, res);
 
   // 1. Handle CORS preflight request
@@ -75,6 +73,9 @@ export default async function handler(req, res) {
       userData.roundId += 1; // Increment roundId
       await client.set(token, JSON.stringify(userData));
 
+      // --- THIS IS THE FIX ---
+      // This response now matches the "KATANICA" currency
+      // and other rules from your frontend's window.__OPTIONS__
       const response = {
         api_version: '2',
         options: {
@@ -86,7 +87,10 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'GEMS', symbol: 'GEMS', subunits: 100, exponent: 2,
+            code: 'KATANICA', // <-- FIXED
+            symbol: 'KATANICA', // <-- FIXED
+            subunits: 100,
+            exponent: 2,
           },
           screen: [],
           default_seed: 19270016,
@@ -112,6 +116,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Insufficient funds.' });
       }
 
+      // Our test logic will make this winAmount = bet * 2
       const winAmount = calculateWin(betAmount); 
       const newBalance = currentBalance - betAmount + winAmount;
 
@@ -123,7 +128,7 @@ export default async function handler(req, res) {
         outcome: {
           screen: null, special_symbols: null,
           bet: betAmount,
-          win: winAmount,
+          win: winAmount, // This will be (bet * 2)
           wins: [],
           storage: { 
             seed: Math.floor(Math.random() * 99999999) 
@@ -131,7 +136,7 @@ export default async function handler(req, res) {
         },
         balance: {
           game: 0,
-          wallet: newBalance,
+          wallet: newBalance, // This will be (balance - bet + (bet*2))
         },
         flow: {
           round_id: userData.roundId,
