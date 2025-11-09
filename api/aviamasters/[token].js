@@ -2,6 +2,8 @@
 
 import { Redis } from 'ioredis';
 
+// Initialize the Redis client.
+// It automatically finds and uses the process.env.REDIS_URL
 const client = new Redis(process.env.REDIS_URL);
 
 // --- Re-usable function to add all CORS headers ---
@@ -12,19 +14,31 @@ function setCORSHeaders(res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
-// --- Helper Functions (no change) ---
+// --- Helper function to simulate win logic ---
 function calculateWin(bet) {
   const winChance = Math.random();
   let winMultiplier = 0;
-  if (winChance > 0.8) winMultiplier = 1 + Math.random();
-  else if (winChance > 0.6) winMultiplier = 0.5;
-  return Math.floor(bet * winMultiplier);
-}
-function createLastActionId(roundId) {
-  return `${Date.now()}_${roundId}`;
-}
-// --- End Helper Functions ---
 
+  if (winChance > 0.8) {
+    // 20% chance to win 1x-2x
+    winMultiplier = 1 + Math.random();
+  } else if (winChance > 0.6) {
+    // 20% chance to win 0.5x (partial loss)
+    winMultiplier = 0.5;
+  }
+  // 60% chance to win 0 (total loss)
+
+  const winAmount = Math.floor(bet * winMultiplier);
+  return winAmount;
+}
+
+// --- Helper function to generate a "last action ID" ---
+function createLastActionId(roundId) {
+  const timestamp = Date.now();
+  return `${timestamp}_${roundId}`;
+}
+
+// --- Main API Handler ---
 export default async function handler(req, res) {
   // --- Add CORS Headers to all responses ---
   setCORSHeaders(res);
@@ -55,7 +69,7 @@ export default async function handler(req, res) {
 
     // === COMMAND: INIT ===
     if (command === 'init') {
-      userData.roundId += 1;
+      userData.roundId += 1; // Increment roundId
       await client.set(token, JSON.stringify(userData));
 
       const response = {
@@ -69,7 +83,7 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'KATANICA', symbol: 'KATANICA', subunits: 100, exponent: 2,
+            code: 'GEMS', symbol: 'GEMS', subunits: 100, exponent: 2,
           },
           screen: [], default_seed: 19270016,
         },
@@ -87,25 +101,34 @@ export default async function handler(req, res) {
 
     // === COMMAND: SPIN ===
     if (command === 'spin') {
-      const betAmount = options.bet;
+      // Force all values to be numbers before doing math
+      const betAmount = parseInt(options.bet, 10);
+      const currentBalance = parseInt(userData.balance, 10);
 
-      if (userData.balance < betAmount) {
+      if (currentBalance < betAmount) {
         return res.status(400).json({ error: 'Insufficient funds.' });
       }
 
-      const winAmount = calculateWin(betAmount);
-      const newBalance = userData.balance - betAmount + winAmount;
-      userData.balance = newBalance;
+      const winAmount = calculateWin(betAmount); // This is already a number
+      const newBalance = currentBalance - betAmount + winAmount;
+
+      // Update user data
+      userData.balance = newBalance; // Save the new number
       await client.set(token, JSON.stringify(userData));
 
       const response = {
         api_version: '2',
         outcome: {
           screen: null, special_symbols: null,
-          bet: betAmount, win: winAmount, wins: [],
+          bet: betAmount,
+          win: winAmount,
+          wins: [],
           storage: { seed: Math.random().toString() },
         },
-        balance: { game: 0, wallet: newBalance },
+        balance: {
+          game: 0,
+          wallet: newBalance,
+        },
         flow: {
           round_id: userData.roundId,
           last_action_id: createLastActionId(userData.roundId),
