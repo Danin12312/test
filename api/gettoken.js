@@ -1,3 +1,5 @@
+// /pages/api/gettoken.js
+
 import { Redis } from 'ioredis';
 import { randomUUID } from 'crypto';
 
@@ -9,20 +11,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const randomPart = Math.floor(Math.random() * 9000000) + 1000000;
-  const uuidPart = randomUUID();
-  const token = `${randomPart}/${uuidPart}`;
+  // 1. Generate the unique token (Only the UUID part)
+  const token = randomUUID();
 
+  // 2. Set default data
   const defaultBalance = 500;
   const userData = {
     balance: defaultBalance,
     roundId: 0,
   };
 
+  // 3. Store the data in Redis
   try {
-    // 'set' command is different: must 'stringify' the object
+    // 'set' command: must 'stringify' the object
     await client.set(token, JSON.stringify(userData));
 
+    // 4. Return the new token and balance
     res.status(200).json({
       token: token,
       balance: defaultBalance,
