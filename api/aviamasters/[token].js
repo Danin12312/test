@@ -7,22 +7,24 @@ const client = new Redis(process.env.REDIS_URL);
 // --- Re-usable function to add all CORS headers ---
 // --- FIX: Added 'req' as an argument ---
 function setCORSHeaders(req, res) {
-  const origin = req.headers.origin; // Dynamically get the origin
+  // ------------------------------------------------------------------
+  // ⚠️ YOU MUST UPDATE THIS LINE ⚠️
+  //
+  // Put your *exact* frontend domain here.
+  // If you ran "npx serve", this will be 'http://localhost:3000'
+  //
+  const origin = 'https://test-1wfy.vercel.app/'; // <-- ⚠️ UPDATE THIS
+  //
+  // ------------------------------------------------------------------
   
-  if (origin) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    res.setHeader('Access-Control-Allow-Origin', '*'); 
-  }
-
   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', origin); // Must be a specific domain
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-Requested-With, Content-Type, Accept, Authorization'
   );
 }
-
 // --- Helper function to simulate win logic ---
 function calculateWin(bet) {
   // --- START TEST ---
