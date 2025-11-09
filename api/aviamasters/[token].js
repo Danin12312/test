@@ -10,7 +10,7 @@ const client = new Redis(process.env.REDIS_URL);
 function setCORSHeaders(res) {
   // IMPORTANT: Replace '*' with your frontend's exact domain
   // e.g., 'https://my-game.vercel.app' or 'http://localhost:3000'
-  const origin = 'https://test-ten-omega-97.vercel.app'; // <-- ⚠️ UPDATE THIS
+  const origin = 'https://test-1wfy.vercel.app'; // <-- ⚠️ UPDATE THIS
   
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', origin);
