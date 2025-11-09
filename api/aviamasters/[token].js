@@ -76,8 +76,8 @@ export default async function handler(req, res) {
         reels: { main: [] },
         layout: { reels: 1, rows: 1 },
         currency: {
-          code: 'GEMS',
-          symbol: 'GEMS',
+          code: 'KATANICA',
+          symbol: 'KATANICA',
           subunits: 100,
           exponent: 2,
         },
