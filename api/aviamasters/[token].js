@@ -2,29 +2,33 @@
 
 import { Redis } from 'ioredis';
 
-// Initialize the Redis client.
 const client = new Redis(process.env.REDIS_URL);
+
+// --- Re-usable function to add all CORS headers ---
+function setCORSHeaders(res) {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Or your specific domain
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
 
 // --- Helper Functions (no change) ---
 function calculateWin(bet) {
   const winChance = Math.random();
   let winMultiplier = 0;
-  if (winChance > 0.8) {
-    winMultiplier = 1 + Math.random();
-  } else if (winChance > 0.6) {
-    winMultiplier = 0.5;
-  }
-  const winAmount = Math.floor(bet * winMultiplier);
-  return winAmount;
+  if (winChance > 0.8) winMultiplier = 1 + Math.random();
+  else if (winChance > 0.6) winMultiplier = 0.5;
+  return Math.floor(bet * winMultiplier);
 }
-
 function createLastActionId(roundId) {
-  const timestamp = Date.now();
-  return `${timestamp}_${roundId}`;
+  return `${Date.now()}_${roundId}`;
 }
 // --- End Helper Functions ---
 
 export default async function handler(req, res) {
+  // --- Add CORS Headers to all responses ---
+  setCORSHeaders(res);
+
   // 1. Handle CORS preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -65,7 +69,7 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'GEMS', symbol: 'GEMS', subunits: 100, exponent: 2,
+            code: 'KATANICA', symbol: 'KATANICA', subunits: 100, exponent: 2,
           },
           screen: [], default_seed: 19270016,
         },
