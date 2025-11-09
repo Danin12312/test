@@ -83,7 +83,7 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'GEMS', symbol: 'GEMS', subunits: 100, exponent: 2,
+            code: 'KATANICA', symbol: 'KATANICA', subunits: 100, exponent: 2,
           },
           screen: [], default_seed: 19270016,
         },
