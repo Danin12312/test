@@ -2,21 +2,16 @@
 
 import { Redis } from 'ioredis';
 
-// Initialize the Redis client.
 const client = new Redis(process.env.REDIS_URL);
 
 // --- Re-usable function to add all CORS headers ---
-function setCORSHeaders(res) {
-  // ⚠️ This MUST be your frontend's domain.
-  // If you are testing on your local computer, it might be 'http://localhost:8000' or 'http://127.0.0.1:5500'
-  // If your frontend is the HTML file, you might need to find its origin
-  // For now, let's try to find it dynamically.
-  
+// --- FIX: Added 'req' as an argument ---
+function setCORSHeaders(req, res) {
   const origin = req.headers.origin; // Dynamically get the origin
+  
   if (origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   } else {
-    // Fallback if origin is not present (e.g., non-browser requests)
     res.setHeader('Access-Control-Allow-Origin', '*'); 
   }
 
@@ -31,19 +26,10 @@ function setCORSHeaders(res) {
 // --- Helper function to simulate win logic ---
 function calculateWin(bet) {
   // --- START TEST ---
-  // We are forcing a win of 2x the bet to prove the balance math works.
+  // Forcing a win of 2x the bet to prove the balance math works.
   const winAmount = bet * 2;
   return winAmount;
   // --- END TEST ---
-
-  /* --- (This is the original "hard to win" logic) ---
-  const winChance = Math.random();
-  let winMultiplier = 0;
-  if (winChance > 0.8) winMultiplier = 1 + Math.random();
-  else if (winChance > 0.6) winMultiplier = 0.5;
-  const winAmount = Math.floor(bet * winMultiplier);
-  return winAmount;
-  */
 }
 
 // --- Helper function to generate a "last action ID" ---
@@ -55,7 +41,8 @@ function createLastActionId(roundId) {
 // --- Main API Handler ---
 export default async function handler(req, res) {
   // --- Add CORS Headers to all responses ---
-  setCORSHeaders(res);
+  // --- FIX: Passed 'req' to the function ---
+  setCORSHeaders(req, res);
 
   // 1. Handle CORS preflight request
   if (req.method === 'OPTIONS') {
@@ -97,15 +84,15 @@ export default async function handler(req, res) {
           paytable: {}, paytables: {}, special_symbols: [], lines: [],
           reels: { main: [] }, layout: { reels: 1, rows: 1 },
           currency: {
-            code: 'KATANICA', symbol: 'KATANICA', subunits: 100, exponent: 2,
+            code: 'GEMS', symbol: 'GEMS', subunits: 100, exponent: 2,
           },
           screen: [],
-          default_seed: 19270016, // Using your original requested seed
+          default_seed: 19270016,
         },
         balance: { game: 0, wallet: userData.balance },
         flow: {
           round_id: userData.roundId,
-          last_action_id: `${userData.roundId}_1`, // Matched format
+          last_action_id: `${userData.roundId}_1`,
           state: 'ready',
           command: 'init',
           available_actions: ['init', 'spin'],
@@ -123,12 +110,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Insufficient funds.' });
       }
 
-      // Our test logic will make this winAmount = bet * 2
       const winAmount = calculateWin(betAmount); 
       const newBalance = currentBalance - betAmount + winAmount;
 
-      // Update user data
-      userData.balance = newBalance; // Save the new number
+      userData.balance = newBalance;
       await client.set(token, JSON.stringify(userData));
 
       const response = {
@@ -136,20 +121,19 @@ export default async function handler(req, res) {
         outcome: {
           screen: null, special_symbols: null,
           bet: betAmount,
-          win: winAmount, // This will be (bet * 2)
+          win: winAmount,
           wins: [],
           storage: { 
-             // --- THIS IS THE FIX ---
             seed: Math.floor(Math.random() * 99999999) 
           },
         },
         balance: {
           game: 0,
-          wallet: newBalance, // This will be (balance - bet + (bet*2))
+          wallet: newBalance,
         },
         flow: {
           round_id: userData.roundId,
-          last_action_id: `${userData.roundId}_1`, // Matched format
+          last_action_id: `${userData.roundId}_1`,
           state: 'closed',
           command: 'spin',
           available_actions: ['init', 'spin'],
